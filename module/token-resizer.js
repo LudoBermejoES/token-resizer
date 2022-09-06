@@ -100,11 +100,5 @@ function registerHooks() {
 }
 
 // Import TypeScript modules
-let appId = '';
-appId = '3';
-const globals = {
-    appId,
-};
-window.TokenAttractor = globals;
 registerHooks();
 //# sourceMappingURL=token-resizer.js.map
