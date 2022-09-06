@@ -1,7 +1,7 @@
 {
-  "name": "token-attractor",
-  "title": "Token attractor",
-  "description": "An easy way to build vortexes (with rolls)",
+  "name": "token-resizer",
+  "title": "Token Resizer",
+  "description": "Very small module to resize tokens to half size when they are on the same position",
   "version": "0.0.3",
   "authors": [
     {
@@ -11,12 +11,13 @@
   ],
   "minimumCoreVersion": "9",
   "compatibleCoreVersion": "9",
-  "esmodules": ["module/token-attractor.js"],
+  "esmodules": ["module/token-resizer.js"],
   "socket": true,
-  "url": "https://github.com/ludobermejoes/token-attractor",
-  "manifest": "https://raw.githubusercontent.com/ludobermejoes/token-attractor/master/src/module.json",
-  "download": "https://github.com/ludobermejoes/token-attractor/releases/latest/download/dist.zip",
+  "url": "https://github.com/ludobermejoes/token-resizer",
+  "manifest": "https://raw.githubusercontent.com/ludobermejoes/token-resizer/master/src/module.json",
+  "download": "https://github.com/ludobermejoes/token-resizer/releases/latest/download/dist.zip",
   "license": "",
-  "readme": "https://github.com/ludobermejoes/token-attractor/blob/master/README.md",
+  "readme": "https://github.com/ludobermejoes/token-resizer/blob/master/README.md",
   "library": false
 }
+9
