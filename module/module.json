@@ -9,12 +9,6 @@
       "email": "LudoBermejo@gmail.com"
     }
   ],
-  "dependencies": [
-    {
-      "name": "socketlib",
-      "manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/v1.0.9/module.json"
-    }
-  ],
   "minimumCoreVersion": "9",
   "compatibleCoreVersion": "9",
   "esmodules": ["module/token-resizer.js"],

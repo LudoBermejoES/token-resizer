@@ -1,4 +1,22 @@
-export function storeOriginalPosition(token: TokenDocument, changes: any) {
+function getObjectFromToken(token: any): TokenDocument | undefined {
+  if (!token.data) {
+    const tokens = game?.scenes?.active?.data?.tokens;
+    if (tokens) {
+      return <TokenDocument>tokens.find((t) => t.data._id === token._id);
+    }
+  } else {
+    return token;
+  }
+  return undefined;
+}
+
+export function storeOriginalPosition(tokenP: TokenDocument | Token, changes: any) {
+  if (!game?.user?.isGM) {
+    return;
+  }
+  const token: TokenDocument | undefined = getObjectFromToken(tokenP);
+  if (!token) return;
+
   if (changes.x || changes.y) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -57,9 +75,14 @@ function reduceTokensInTheSamePosition(tokensInSamePos: TokenDocument[]) {
   }
 }
 
-async function restoreTokensIfTheyAreReduced(token: TokenDocument, tokensInTheOldPos: TokenDocument[]) {
+async function restoreTokensIfTheyAreReduced(token: TokenDocument | Token, tokensInTheOldPos: TokenDocument[]) {
   if (token.data.width !== 0.5) return;
-  await token.update({ width: 1, height: 1 });
+  if (token instanceof TokenDocument) {
+    await token.update({ width: 1, height: 1 });
+  } else if (token instanceof Token) {
+    await token.data.update({ width: 1, height: 1 });
+  }
+
   const getSnapped: { x: number; y: number } | number[] = game?.canvas?.grid?.grid?.getSnappedPosition(
     token.data.x,
     token.data.y,
@@ -81,9 +104,16 @@ async function restoreTokensIfTheyAreReduced(token: TokenDocument, tokensInTheOl
   }
 }
 
-export async function changeTokensSizeIfInTheSameGridPosition(token: TokenDocument, changes: any) {
+export async function changeTokensSizeIfInTheSameGridPosition(tokenP: TokenDocument | Token, changes: any) {
+  if (!game?.user?.isGM) {
+    return;
+  }
+
+  const token: TokenDocument | undefined = getObjectFromToken(tokenP);
+  if (!token) return;
+
   if (changes.x === undefined && changes.y === undefined) return;
-  if (!game.user?.isGM) return;
+  //  if (!game.user?.isGM) return;
   const newGridPosition = game?.canvas?.grid?.grid?.getGridPositionFromPixels(
     changes.x || token.data.x,
     changes.y || token.data.y,

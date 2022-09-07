@@ -1,4 +1,22 @@
-function storeOriginalPosition(token, changes) {
+function getObjectFromToken(token) {
+    if (!token.data) {
+        const tokens = game?.scenes?.active?.data?.tokens;
+        if (tokens) {
+            return tokens.find((t) => t.data._id === token._id);
+        }
+    }
+    else {
+        return token;
+    }
+    return undefined;
+}
+function storeOriginalPosition(tokenP, changes) {
+    if (!game?.user?.isGM) {
+        return;
+    }
+    const token = getObjectFromToken(tokenP);
+    if (!token)
+        return;
     if (changes.x || changes.y) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -56,7 +74,12 @@ function reduceTokensInTheSamePosition(tokensInSamePos) {
 async function restoreTokensIfTheyAreReduced(token, tokensInTheOldPos) {
     if (token.data.width !== 0.5)
         return;
-    await token.update({ width: 1, height: 1 });
+    if (token instanceof TokenDocument) {
+        await token.update({ width: 1, height: 1 });
+    }
+    else if (token instanceof Token) {
+        await token.data.update({ width: 1, height: 1 });
+    }
     const getSnapped = game?.canvas?.grid?.grid?.getSnappedPosition(token.data.x, token.data.y) || [0, 0];
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -74,11 +97,16 @@ async function restoreTokensIfTheyAreReduced(token, tokensInTheOldPos) {
         }
     }
 }
-async function changeTokensSizeIfInTheSameGridPosition(token, changes) {
+async function changeTokensSizeIfInTheSameGridPosition(tokenP, changes) {
+    if (!game?.user?.isGM) {
+        return;
+    }
+    const token = getObjectFromToken(tokenP);
+    if (!token)
+        return;
     if (changes.x === undefined && changes.y === undefined)
         return;
-    if (!game.user?.isGM)
-        return;
+    //  if (!game.user?.isGM) return;
     const newGridPosition = game?.canvas?.grid?.grid?.getGridPositionFromPixels(changes.x || token.data.x, changes.y || token.data.y) || [0, 0];
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -94,11 +122,28 @@ async function changeTokensSizeIfInTheSameGridPosition(token, changes) {
         : restoreTokensIfTheyAreReduced(token, tokensInTheOldPos);
 }
 
+const MODULE_NAME = 'token-resizer';
+const functionsToRegister = {
+    changeTokensSizeIfInTheSameGridPosition,
+    storeOriginalPosition,
+};
+function registerFunctions() {
+    console.log('REGISTRO LAS OPCIONES');
+    TokenResizer.socket = socketlib.registerModule(MODULE_NAME);
+    for (const [alias, func] of Object.entries(functionsToRegister)) {
+        console.log(alias, func);
+        TokenResizer.socket.register(alias, func);
+    }
+}
+
 function registerHooks() {
+    Hooks.once('socketlib.ready', registerFunctions);
     Hooks.on('preUpdateToken', storeOriginalPosition);
     Hooks.on('updateToken', changeTokensSizeIfInTheSameGridPosition);
 }
 
 // Import TypeScript modules
+const globals = {};
+window.TokenResizer = globals;
 registerHooks();
 //# sourceMappingURL=token-resizer.js.map
