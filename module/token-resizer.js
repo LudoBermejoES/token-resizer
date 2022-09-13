@@ -41,34 +41,36 @@ function divideTokensByPosition(newGridPosition, originalPosition) {
     };
 }
 function reduceTokensInTheSamePosition(tokensInSamePos) {
+    if (tokensInSamePos.length > 2)
+        return;
     for (let i = 0; i < tokensInSamePos.length; i++) {
         const token = tokensInSamePos[i];
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        token.beforeResize = {
-            x: token.data.x,
-            y: token.data.y,
-        };
         if (token.data.width === 1) {
-            const size = (game?.canvas?.grid?.grid?.w || 0) / 4;
-            token.data.width = 0.5;
-            token.data.height = 0.5;
-            let newX = 0;
-            let newY = 0;
-            switch (i) {
-                case 0:
-                    newX = token.data.x;
-                    newY = token.data.y + size;
-                    break;
-                case 1:
-                    newX = token.data.x + size * 2;
-                    newY = token.data.y + size;
-                    break;
-            }
-            token.data.x = newX;
-            token.data.y = newY;
-            token.update({ width: 0.5, height: 0.5, x: newX, y: newY });
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            token.beforeResize = {
+                x: token.data.x,
+                y: token.data.y,
+            };
         }
+        const size = (game?.canvas?.grid?.grid?.w || 0) / 4;
+        token.data.width = 0.5;
+        token.data.height = 0.5;
+        let newX = 0;
+        let newY = 0;
+        switch (i) {
+            case 0:
+                newX = token.data.x;
+                newY = token.data.y + size;
+                break;
+            case 1:
+                newX = token.data.x + size * 2;
+                newY = token.data.y + size;
+                break;
+        }
+        token.data.x = newX;
+        token.data.y = newY;
+        token.update({ width: 0.5, height: 0.5, x: newX, y: newY });
     }
 }
 async function restoreTokensIfTheyAreReduced(token, tokensInTheOldPos) {
